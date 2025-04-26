@@ -5,10 +5,10 @@
     "description": "SMS API",
     "version": "1.0.0"
   },
-  "host": "localhost:3000",
+  "host": "educonnect-api-bprr.onrender.com",
   "basePath": "/",
   "schemes": [
-    "http"
+    "https"
   ],
   "paths": {
     "/": {

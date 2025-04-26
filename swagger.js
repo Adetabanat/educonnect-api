@@ -5,8 +5,8 @@ const doc = {
         title: "Educonnect API",
         description: "SMS API"
     },
-    host: "localhost:3000",
-    schemes: ["http"]
+    host: "https://educonnect-api-bprr.onrender.com",
+    schemes: ["https"]
 }
 
 const outputfile = "./swagger.json";
