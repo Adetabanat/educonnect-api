@@ -1,7 +1,7 @@
 // Noah Ruppe created this page
 
 const validator = require('../helpers/validate');
-const saveuser = async (req, res, next) => {
+const saveUser = async (req, res, next) => {
     const validationRule = {
         firstName: 'required|string',
         lastName: 'required|string',
@@ -31,5 +31,5 @@ const saveuser = async (req, res, next) => {
 
 
 module.exports = {
-    saveuser,
+    saveUser,
 };
