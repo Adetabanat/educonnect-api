@@ -6,6 +6,8 @@ router.use("/", require("./swagger"));
 
 
 router.use("/users", require("./users"));
+router.use("/students", require("./students"));
+
 
 
 
