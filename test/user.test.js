@@ -3,23 +3,24 @@ const app = require("../app");
 const mongodb = require("../data/database");
 
 jest.mock("../data/database", () => ({
-  getDatabase: jest.fn().mockReturnValue({
-    db: jest.fn().mockReturnValue({
-      collection: jest.fn().mockReturnValue({
+  getDatabase: jest.fn(() => ({
+    db: jest.fn(() => ({
+      collection: jest.fn(() => ({
         find: jest.fn(),
         findOne: jest.fn(),
         insertOne: jest.fn(),
         updateOne: jest.fn(),
         deleteOne: jest.fn()
-      })
-    })
-  })
+      }))
+    }))
+  }))
 }));
 
 describe("GET /users", () => {
   it("should return a list of users", async () => {
     const mockUsers = [
-      { id: "67ec87871663f3ed9943ec6f", firstName: "John", lastName: "Doe", userName: "johndoe" }
+      { firstName: "John", lastName: "Doe" },
+      { firstName: "Jane", lastName: "Smith" }
     ];
 
     const collection = mongodb.getDatabase().db().collection();
@@ -27,7 +28,7 @@ describe("GET /users", () => {
       toArray: jest.fn().mockResolvedValue(mockUsers)
     });
 
-    const response = await request(app).get("/users"); // ✅ corrected path
+    const response = await request(app).get("/users");
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(mockUsers);
@@ -36,10 +37,11 @@ describe("GET /users", () => {
 
 describe("GET /users/:id", () => {
   it("should return a single user", async () => {
-    const mockUser = { id: "67ec87871663f3ed9943ec6f", firstName: "John", lastName: "Doe", userName: "johndoe" };
+    const mockUser = { firstName: "John", lastName: "Doe" };
     const userId = "67ec87871663f3ed9943ec6f";
 
-    mongodb.getDatabase().db().collection().findOne.mockResolvedValue(mockUser); // 👈 not find()
+    const collection = mongodb.getDatabase().db().collection();
+    collection.findOne.mockResolvedValue(mockUser);
 
     const response = await request(app).get(`/users/${userId}`);
 

@@ -1,96 +1,108 @@
 const mongodb = require("../data/database");
 const ObjectId = require("mongodb").ObjectId;
 
+// Get all users
 const getAll = async (req, res) => {
-    try {
-        const result = await mongodb.getDatabase().db().collection("users").find();
-        const users = await result.toArray();
+  try {
+    const result = await mongodb.getDatabase().collection("users").find();
+    const users = await result.toArray();
 
-        res.setHeader("Content-Type", "application/json");
-        res.status(200).json(users);
-    } catch (err) {
-        res.status(500).json({ message: "An error occurred while fetching the users", error: err });
-    }
+    res.setHeader("Content-Type", "application/json");
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ message: "An error occurred while fetching the users", error: err.message });
+  }
 };
 
+// Get a single user
 const getSingle = async (req, res) => {
-    try {
-        const userId = new ObjectId(req.params.id);
-        const result = await mongodb.getDatabase().db().collection("users").find({_id: userId});
-        const users = await result.toArray();
+  try {
+    const userId = new ObjectId(req.params.id);
 
-        res.setHeader("Content-Type", "application/json");
-        res.status(200).json(users[0]);
-    } catch (err) {
-        res.status(500).json({ message: "An error occurred while fetching the user", error: err });
+    const user = await mongodb.getDatabase().collection("users").findOne({ _id: userId });
+
+    res.setHeader("Content-Type", "application/json");
+
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      res.status(404).json({ message: "User not found" });
     }
+  } catch (err) {
+    res.status(500).json({ message: "An error occurred while fetching the user", error: err.message });
+  }
 };
 
+// Create a new user
 const createUser = async (req, res) => {
-    try {
-        const user = {
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
-            password: req.body.password,
-            phoneNumber: req.body.phoneNumber,
-            role: req.body.role,
-            address: req.body.address    
-        };
+  try {
+    const user = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      password: req.body.password,
+      phoneNumber: req.body.phoneNumber,
+      role: req.body.role,
+      address: req.body.address    
+    };
 
-        const response = await mongodb.getDatabase().db().collection("users").insertOne(user);
-        if (response.acknowledged) {
-            res.status(201).json({ message: "User created successfully" });
-        } else {
-            res.status(500).json({ message: "An error occurred while creating the user" });
-        }
-    } catch (err) {
-        res.status(500).json({ message: "An error occurred while creating the user", error: err });
+    const response = await mongodb.getDatabase().collection("users").insertOne(user);
+
+    if (response.acknowledged) {
+      res.status(201).json({ message: "User created successfully" });
+    } else {
+      res.status(500).json({ message: "An error occurred while creating the user" });
     }
+  } catch (err) {
+    res.status(500).json({ message: "An error occurred while creating the user", error: err.message });
+  }
 };
 
+// Update an existing user
 const updateUser = async (req, res) => {
-    try {
-        const userId = new ObjectId(req.params.id);
+  try {
+    const userId = new ObjectId(req.params.id);
 
-        const updatedUser = {
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
-            password: req.body.password,
-            phoneNumber: req.body.phoneNumber,
-            role: req.body.role,
-            address: req.body.address
-        };
+    const updatedUser = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      password: req.body.password,
+      phoneNumber: req.body.phoneNumber,
+      role: req.body.role,
+      address: req.body.address
+    };
 
-        const response = await mongodb.getDatabase().db().collection("users").updateOne(
-            { _id: userId },
-            { $set: updatedUser }
-        );
+    const response = await mongodb.getDatabase().collection("users").updateOne(
+      { _id: userId },
+      { $set: updatedUser }
+    );
 
-        if (response.modifiedCount > 0) {
-            res.status(200).json({ message: "User updated successfully" });
-        } else {
-            res.status(404).json({ message: "No changes made, user may not exist or data is the same" });
-        }
-    } catch (err) {
-        res.status(500).json({ message: "An error occurred while updating the user", error: err });
+    if (response.modifiedCount > 0) {
+      res.status(200).json({ message: "User updated successfully" });
+    } else {
+      res.status(404).json({ message: "No changes made, user may not exist or data is the same" });
     }
+  } catch (err) {
+    res.status(500).json({ message: "An error occurred while updating the user", error: err.message });
+  }
 };
 
+// Delete a user
 const deleteUser = async (req, res) => {
-    try {
-        const userId = new ObjectId(req.params.id);
-        const response = await mongodb.getDatabase().db().collection("users").deleteOne({ _id: userId });
+  try {
+    const userId = new ObjectId(req.params.id);
 
-        if (response.deletedCount > 0) {
-            res.status(200).json({ message: "User deleted successfully" });
-        } else {
-            res.status(404).json({ message: "User not found" });
-        }
-    } catch (err) {
-        res.status(500).json({ message: "An error occurred while deleting the user", error: err });
+    const response = await mongodb.getDatabase().collection("users").deleteOne({ _id: userId });
+
+    if (response.deletedCount > 0) {
+      res.status(200).json({ message: "User deleted successfully" });
+    } else {
+      res.status(404).json({ message: "User not found" });
     }
+  } catch (err) {
+    res.status(500).json({ message: "An error occurred while deleting the user", error: err.message });
+  }
 };
 
 module.exports = { getAll, getSingle, createUser, updateUser, deleteUser };
